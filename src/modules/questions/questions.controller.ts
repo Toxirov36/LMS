@@ -29,7 +29,7 @@ export class QuestionsController {
     @CurrentUser('id') userId: number,
     @CurrentUser('role') role: UserRole,
   ) {
-    return this.questionsService.findByCourse(courseId, userId, role);
+    return this.questionsService.findByCourse(+courseId, userId, role);
   }
 
   @Get('unread')

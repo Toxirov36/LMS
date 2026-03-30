@@ -7,7 +7,7 @@ import { PrismaService } from 'src/core/database/prisma.service';
 export class SectionsService {
   constructor(private prisma: PrismaService) {}
 
-  private async checkCourseOwnership(userId: number, courseId: string) {
+  private async checkCourseOwnership(userId: number, courseId: number) {
     const user = await this.prisma.user.findUnique({ where: { id: userId } });
     
     if (!user) throw new NotFoundException('User topilmadi');
@@ -24,7 +24,7 @@ export class SectionsService {
     return this.prisma.sectionLesson.create({ data: dto });
   }
 
-  async findByCourse(courseId: string) {
+  async findByCourse(courseId: number) {
     return this.prisma.sectionLesson.findMany({
       where: { courseId },
       include: {

@@ -24,7 +24,7 @@ export class RatingsController {
   @Get('course/:courseId')
   @ApiOperation({ summary: 'Kurs baholari' })
   findByCourse(@Param('courseId') courseId: string) {
-    return this.ratingsService.findByCourse(courseId);
+    return this.ratingsService.findByCourse(+courseId);
   }
 
   @Delete(':id')

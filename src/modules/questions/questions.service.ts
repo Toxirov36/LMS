@@ -13,7 +13,7 @@ export class QuestionsService {
     return this.prisma.question.create({ data: { ...dto, userId } });
   }
 
-  async findByCourse(courseId: string, userId: number, role: UserRole) {
+  async findByCourse(courseId: number, userId: number, role: UserRole) {
     const where: any = { courseId };
     if (role === UserRole.STUDENT) where.userId = userId;
     return this.prisma.question.findMany({

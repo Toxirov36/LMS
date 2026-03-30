@@ -26,7 +26,7 @@ export class RatingsService {
     return this.prisma.rating.create({ data: { ...dto, userId } });
   }
 
-  async findByCourse(courseId: string) {
+  async findByCourse(courseId: number) {
     const ratings = await this.prisma.rating.findMany({
       where: { courseId },
       include: { user: { select: { id: true, fullName: true, image: true } } },

@@ -17,7 +17,7 @@ export class SectionsController {
   @Get('course/:courseId')
   @ApiOperation({ summary: 'Kurs bolimlari' })
   findByCourse(@Param('courseId') courseId: string) {
-    return this.sectionsService.findByCourse(courseId);
+    return this.sectionsService.findByCourse(+courseId);
   }
 
   @Get(':id')

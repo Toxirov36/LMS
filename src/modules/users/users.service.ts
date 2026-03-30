@@ -73,7 +73,7 @@ export class UsersService {
     }
 
     async updateLastActivity(userId: number, data: {
-        courseId?: string; sectionId?: number; lessonId?: string; url?: string;
+        courseId?: number; sectionId?: number; lessonId?: string; url?: string;
     }) {
         return this.prisma.lastActivity.upsert({
             where: { userId },
@@ -83,7 +83,7 @@ export class UsersService {
     }
 
     async getLastActivity(userId: number) {
-        return this.prisma.lastActivity.findUnique({
+        return await this.prisma.lastActivity.findUnique({
             where: { userId },
             include: { course: true, section: true, lesson: true },
         });

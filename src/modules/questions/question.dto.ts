@@ -1,11 +1,12 @@
-import { IsString, IsNotEmpty, IsOptional } from 'class-validator';
+import { IsString, IsNotEmpty, IsOptional, IsInt } from 'class-validator';
+import { Type } from 'class-transformer';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class CreateQuestionDto {
   @ApiProperty()
-  @IsString()
-  @IsNotEmpty()
-  courseId: string;
+  @Type(() => Number)
+  @IsInt()
+  courseId: number;
 
   @ApiProperty()
   @IsString()

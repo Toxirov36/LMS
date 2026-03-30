@@ -127,7 +127,7 @@ export class LessonsService {
         return { message: 'Fayl ochirildi' };
     }
 
-    async getProgress(userId: number, courseId: string) {
+    async getProgress(userId: number, courseId: number) {
         const total = await this.prisma.lesson.count({ where: { section: { courseId } } });
         const viewed = await this.prisma.lessonView.count({
             where: { userId, view: true, lesson: { section: { courseId } } },

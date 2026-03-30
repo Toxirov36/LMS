@@ -8,8 +8,15 @@ async function bootstrap() {
   const config = new DocumentBuilder()
     .setTitle("Learning Managment System")
     .addBearerAuth()
+    .addTag("Auth")
+    .addTag("Users")
+    .addTag("Courses")
+    .addTag("Categories")
+    .addTag("Homework")
+    .addTag("Questions")
+    .addTag("Sections")
+    .addTag("Upload")
     .build()
-    
 
   const documentFactory = () => SwaggerModule.createDocument(app, config)
   SwaggerModule.setup("swagger", app, documentFactory)

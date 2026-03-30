@@ -92,7 +92,7 @@ model CourseCategory {
 }
 
 model Course {
-  id           String      @id @default(uuid())
+  id           Int      @id @default(autoincrement())
   name         String
   about        String
   price        Decimal
@@ -119,7 +119,7 @@ model Course {
 
 model AssignedCourse {
   userId    Int
-  courseId  String
+  courseId  Int
   createdAt DateTime @default(now())
 
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -130,7 +130,7 @@ model AssignedCourse {
 }
 
 model PurchasedCourse {
-  courseId    String
+  courseId    Int
   userId      Int
   amount      Decimal?
   paidVia     PaidVia
@@ -147,7 +147,7 @@ model Rating {
   id        Int      @id @default(autoincrement())
   rate      Int
   comment   String
-  courseId  String
+  courseId  Int
   userId    Int
   createdAt DateTime @default(now())
 
@@ -160,7 +160,7 @@ model Rating {
 model LastActivity {
   id        Int       @id @default(autoincrement())
   userId    Int       @unique
-  courseId  String?
+  courseId  Int?
   sectionId Int?
   lessonId  String?
   url       String?
@@ -177,7 +177,7 @@ model LastActivity {
 model SectionLesson {
   id        Int      @id @default(autoincrement())
   name      String
-  courseId  String
+  courseId  Int
   createdAt DateTime @default(now())
 
   course         Course         @relation(fields: [courseId], references: [id])
@@ -314,7 +314,7 @@ model ExamResult {
 model Question {
   id        Int       @id @default(autoincrement())
   userId    Int
-  courseId  String
+  courseId  Int
   text      String
   file      String?
   read      Boolean   @default(false)

@@ -20,6 +20,10 @@ import { RatingsModule } from './modules/ratings/ratings.module';
 import { SectionsModule } from './modules/sections/sections.module';
 import { UploadController } from './modules/upload/upload.controller';
 import { UploadModule } from './modules/upload/upload.module';
+import { LessonGroupsModule } from './modules/lesson-groups/lesson-groups.module';
+import { PurchasedCoursesService } from './modules/purchased-courses/purchased-courses.service';
+import { PurchasedCoursesController } from './modules/purchased-courses/purchased-courses.controller';
+import { PurchasedCoursesModule } from './modules/purchased-courses/purchased-courses.module';
 
 @Module({
   imports: [
@@ -38,9 +42,11 @@ import { UploadModule } from './modules/upload/upload.module';
     QuestionsModule,
     RatingsModule,
     SectionsModule,
-    UploadModule
+    UploadModule,
+    LessonGroupsModule,
+    PurchasedCoursesModule
   ],
-  providers: [AuthService, ExamService, LessonsService, RatingsService],
-  controllers: [ExamController, LessonsController, RatingsController, UploadController],
+  providers: [AuthService, ExamService, LessonsService, RatingsService, PurchasedCoursesService],
+  controllers: [ExamController, LessonsController, RatingsController, UploadController, PurchasedCoursesController],
 })
 export class AppModule {}

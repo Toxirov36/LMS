@@ -29,7 +29,7 @@ export class LessonsController {
   @Get('progress/:courseId')
   @ApiOperation({ summary: 'Kurs progressi' })
   getProgress(@CurrentUser('id') userId: number, @Param('courseId') courseId: string) {
-    return this.lessonsService.getProgress(userId, courseId);
+    return this.lessonsService.getProgress(userId, +courseId);
   }
 
   @Post()

@@ -16,7 +16,7 @@ export class CreateRatingDto {
   comment: string;
 
   @ApiProperty()
-  @IsString()
-  @IsNotEmpty()
-  courseId: string;
+  @Type(() => Number)
+  @IsInt()
+  courseId: number;
 }

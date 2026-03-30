@@ -1,13 +1,19 @@
 import {
-  Controller, Get, Post, Patch, Delete, Body, Param, Query,
-  UseGuards, ParseUUIDPipe
+  Controller, Get, Post, Patch, Delete,
+  Body, Param, UseGuards,
 } from '@nestjs/common';
 import { ApiTags, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 import { UserRole } from '@prisma/client';
 import { CoursesService } from './courses.service';
-import { CreateCourseDto, UpdateCourseDto, PurchaseCourseDto, AssignCourseDto, CourseFilterDto } from './courses.dto';
-import { AuthGuard } from 'src/core/guards/jwt.guard';
+import {
+  CreateCourseDto,
+  UpdateCourseDto,
+  AssignAssistantDto,
+  UnassignAssistantDto,
+  UpdateCourseMentorDto,
+} from './courses.dto';
 import { CurrentUser, RoleGuard } from 'src/core/guards/roles.guard';
+import { AuthGuard } from 'src/core/guards/jwt.guard';
 import { Roles } from 'src/core/decorators/role.decorator';
 
 @ApiTags('Courses')
@@ -15,126 +21,164 @@ import { Roles } from 'src/core/decorators/role.decorator';
 export class CoursesController {
   constructor(private coursesService: CoursesService) {}
 
+  // ─── PUBLIC ───────────────────────────────────────────────
   @Get()
-  @ApiOperation({ summary: 'Barcha chop etilgan kurslar' })
-  findAll(@Query() filter: CourseFilterDto) {
-    return this.coursesService.findAll(filter);
+  @ApiOperation({ summary: 'Barcha nashr etilgan kurslar' })
+  findAll() {
+    return this.coursesService.findAll();
   }
 
-  @Get('admin/all')
+  @Get('single/:id')
+  @ApiOperation({ summary: 'Kurs haqida qisqa ma\'lumot (public)' })
+  findSingle(@Param('id') id: string) {
+    return this.coursesService.findSingle(+id);
+  }
+
+  // ─── AUTH REQUIRED ────────────────────────────────────────
+  @Get('single-full/:id')
+  @UseGuards(AuthGuard, RoleGuard)
+  @Roles(UserRole.ADMIN, UserRole.MENTOR, UserRole.ASSISTANT)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Kurs to\'liq ma\'lumoti - ADMIN, MENTOR, ASSISTANT' })
+  findSingleFull(@Param('id') id: string) {
+    return this.coursesService.findSingleFull(+id);
+  }
+
+  @Get('all')
   @UseGuards(AuthGuard, RoleGuard)
   @Roles(UserRole.ADMIN)
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Barcha kurslar - Admin' })
+  @ApiOperation({ summary: 'Barcha kurslar (nashr etilmagan ham) - ADMIN' })
   findAllAdmin() {
     return this.coursesService.findAllAdmin();
   }
 
-  @Get('my/mentor')
+  @Get('my')
   @UseGuards(AuthGuard, RoleGuard)
   @Roles(UserRole.MENTOR, UserRole.ADMIN)
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Mentor kurslarim' })
-  findMyMentorCourses(@CurrentUser('id') userId: number) {
-    return this.coursesService.findMyMentorCourses(userId);
+  @ApiOperation({ summary: 'Mening kurslarim - MENTOR, ADMIN' })
+  findMyCourses(@CurrentUser('id') userId: number) {
+    return this.coursesService.findMyCourses(userId);
   }
 
-  @Get('my/purchased')
-  @UseGuards(AuthGuard)
+  @Get('mentor/:id')
+  @UseGuards(AuthGuard, RoleGuard)
+  @Roles(UserRole.ADMIN)
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Sotib olingan kurslarim' })
-  findMyPurchasedCourses(@CurrentUser('id') userId: number) {
-    return this.coursesService.findMyPurchasedCourses(userId);
+  @ApiOperation({ summary: 'Mentor kurslari - ADMIN' })
+  findMentorCourses(@Param('id') mentorId: string) {
+    return this.coursesService.findMentorCourses(Number(mentorId));
   }
 
   @Get('my/assigned')
-  @UseGuards(AuthGuard)
+  @UseGuards(AuthGuard, RoleGuard)
+  @Roles(UserRole.ASSISTANT)
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Biriktirilgan kurslarim' })
-  findMyAssignedCourses(@CurrentUser('id') userId: number) {
-    return this.coursesService.findMyAssignedCourses(userId);
+  @ApiOperation({ summary: 'Menga biriktirilgan kurslar - ASSISTANT' })
+  findMyAssigned(@CurrentUser('id') userId: number) {
+    return this.coursesService.findAssistantCourses(userId);
   }
 
-  @Get(':id')
-  @ApiOperation({ summary: 'Bitta kurs' })
-  findOne(@Param('id', ParseUUIDPipe) id: string) {
-    return this.coursesService.findOne(id);
-  }
-
-  @Get(':id/stats')
-  @UseGuards(AuthGuard)
-  @ApiBearerAuth()
-  @ApiOperation({ summary: 'Kurs statistikasi' })
-  getStats(@Param('id', ParseUUIDPipe) id: string) {
-    return this.coursesService.getCourseStats(id);
-  }
-
-  @Get(':id/access')
-  @UseGuards(AuthGuard)
-  @ApiBearerAuth()
-  @ApiOperation({ summary: 'Kursga kirish huquqini tekshirish' })
-  checkAccess(@CurrentUser('id') userId: number, @Param('id', ParseUUIDPipe) id: string) {
-    return this.coursesService.checkAccess(userId, id);
-  }
-
-  @Post()
+  @Get(':courseId/assistants')
   @UseGuards(AuthGuard, RoleGuard)
   @Roles(UserRole.MENTOR, UserRole.ADMIN)
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Kurs yaratish (Mentor/Admin)' })
-  create(@CurrentUser('id') userId: number, @Body() dto: CreateCourseDto) {
-    return this.coursesService.create(userId, dto);
+  @ApiOperation({ summary: 'Kurs assistentlari - MENTOR, ADMIN' })
+  getCourseAssistants(@Param('courseId') courseId: string) {
+    return this.coursesService.getCourseAssistants(+courseId);
   }
 
-  @Post('purchase')
-  @UseGuards(AuthGuard)
-  @ApiBearerAuth()
-  @ApiOperation({ summary: 'Kurs sotib olish' })
-  purchase(@CurrentUser('id') userId: number, @Body() dto: PurchaseCourseDto) {
-    return this.coursesService.purchaseCourse(userId, dto);
-  }
-
-  @Post('assign')
-  @UseGuards(AuthGuard, RoleGuard)
-  @Roles(UserRole.ADMIN, UserRole.ASSISTANT)
-  @ApiBearerAuth()
-  @ApiOperation({ summary: 'Kurs biriktirish (Admin/Assistant)' })
-  assign(@CurrentUser('id') adminId: number, @Body() dto: AssignCourseDto) {
-    return this.coursesService.assignCourse(adminId, dto);
-  }
-
-  @Patch(':id')
+  @Post('assign-assistant')
   @UseGuards(AuthGuard, RoleGuard)
   @Roles(UserRole.MENTOR, UserRole.ADMIN)
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Kursni yangilash' })
+  @ApiOperation({ summary: 'Kursga assistant biriktirish - MENTOR, ADMIN' })
+  assignAssistant(
+    @Body() dto: AssignAssistantDto,
+    @CurrentUser('id') userId: number,
+    @CurrentUser('role') role: UserRole,
+  ) {
+    return this.coursesService.assignAssistant(dto, userId, role);
+  }
+
+  @Post('unassign-assistant')
+  @UseGuards(AuthGuard, RoleGuard)
+  @Roles(UserRole.MENTOR, UserRole.ADMIN)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Kursdan assistant olib tashlash - MENTOR, ADMIN' })
+  unassignAssistant(
+    @Body() dto: UnassignAssistantDto,
+    @CurrentUser('id') userId: number,
+    @CurrentUser('role') role: UserRole,
+  ) {
+    return this.coursesService.unassignAssistant(dto, userId, role);
+  }
+
+  @Post('create')
+  @UseGuards(AuthGuard, RoleGuard)
+  @Roles(UserRole.ADMIN, UserRole.MENTOR)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Kurs yaratish - ADMIN, MENTOR' })
+  create(
+    @Body() dto: CreateCourseDto,
+    @CurrentUser('id') userId: number,
+    @CurrentUser('role') role: UserRole,
+  ) {
+    return this.coursesService.create(dto, userId, role);
+  }
+
+  @Patch('update/:id')
+  @UseGuards(AuthGuard, RoleGuard)
+  @Roles(UserRole.ADMIN, UserRole.MENTOR)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Kursni tahrirlash - ADMIN, MENTOR' })
   update(
-    @CurrentUser('id') userId: number,
-    @Param('id', ParseUUIDPipe) id: string,
+    @Param('id') id: string,
     @Body() dto: UpdateCourseDto,
-  ) {
-    return this.coursesService.update(userId, id, dto);
-  }
-
-  @Patch(':id/publish')
-  @UseGuards(AuthGuard, RoleGuard)
-  @Roles(UserRole.MENTOR, UserRole.ADMIN)
-  @ApiBearerAuth()
-  @ApiOperation({ summary: 'Kursni chop etish / yashirish' })
-  publish(
     @CurrentUser('id') userId: number,
-    @Param('id', ParseUUIDPipe) id: string,
-    @Body('published') published: boolean,
+    @CurrentUser('role') role: UserRole,
   ) {
-    return this.coursesService.publish(userId, id, published);
+    return this.coursesService.update(+id, dto, userId, role);
   }
 
-  @Delete(':id')
+  @Post('publish/:id')
   @UseGuards(AuthGuard, RoleGuard)
-  @Roles(UserRole.MENTOR, UserRole.ADMIN)
+  @Roles(UserRole.ADMIN)
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Kursni ochirish' })
-  remove(@CurrentUser('id') userId: number, @Param('id', ParseUUIDPipe) id: string) {
-    return this.coursesService.remove(userId, id);
+  @ApiOperation({ summary: 'Kursni nashr etish - ADMIN' })
+  publish(@Param('id') id: string) {
+    return this.coursesService.setPublished(+id, true);
+  }
+
+  @Post('unpublish/:id')
+  @UseGuards(AuthGuard, RoleGuard)
+  @Roles(UserRole.ADMIN)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Kursni yopish - ADMIN' })
+  unpublish(@Param('id') id: string) {
+    return this.coursesService.setPublished(+id, false);
+  }
+
+  @Patch('update-mentor')
+  @UseGuards(AuthGuard, RoleGuard)
+  @Roles(UserRole.ADMIN)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Kurs mentorini almashtirish - ADMIN' })
+  updateMentor(@Body() dto: UpdateCourseMentorDto) {
+    return this.coursesService.updateMentor(dto);
+  }
+
+  @Delete('delete/:id')
+  @UseGuards(AuthGuard, RoleGuard)
+  @Roles(UserRole.ADMIN, UserRole.MENTOR)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Kursni o\'chirish - ADMIN, MENTOR' })
+  remove(
+    @Param('id') id: string,
+    @CurrentUser('id') userId: number,
+    @CurrentUser('role') role: UserRole,
+  ) {
+    return this.coursesService.remove(+id, userId, role);
   }
 }

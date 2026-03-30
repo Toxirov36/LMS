@@ -28,8 +28,10 @@ export class UsersController {
         return this.usersService.getLastActivity(userId);
     }
 
+    @UseGuards(RoleGuard)
+    @Roles(UserRole.ADMIN)
     @Get(':id')
-    @ApiOperation({ summary: 'Foydalanuvchi profili' })
+    @ApiOperation({ summary: 'Foydalanuvchi profili (Admin)' })
     findOne(@Param('id', ParseIntPipe) id: number) {
         return this.usersService.findOne(id);
     }
@@ -40,6 +42,8 @@ export class UsersController {
         return this.usersService.updateProfile(userId, dto);
     }
 
+    @UseGuards(RoleGuard)
+    @Roles(UserRole.MENTOR)
     @Patch('mentor-profile')
     @ApiOperation({ summary: 'Mentor profilini yangilash' })
     updateMentorProfile(@CurrentUser('id') userId: number, @Body() dto: UpdateMentorProfileDto) {
@@ -52,17 +56,17 @@ export class UsersController {
     @ApiOperation({ summary: 'Rol berish (Admin)' })
     updateRole(
         @CurrentUser('id') adminId: number,
-        @Param('id', ParseIntPipe) targetId: number,
+        @Param('id', ParseIntPipe) userId: number,
         @Body() dto: UpdateRoleDto,
     ) {
-        return this.usersService.updateRole(adminId, targetId, dto);
+        return this.usersService.updateRole(adminId, userId, dto);
     }
 
     @Delete(':id')
     @UseGuards(RoleGuard)
     @Roles(UserRole.ADMIN)
     @ApiOperation({ summary: 'Foydalanuvchini ochirish (Admin)' })
-    deleteUser(@CurrentUser('id') adminId: number, @Param('id', ParseIntPipe) targetId: number) {
-        return this.usersService.deleteUser(adminId, targetId);
+    deleteUser(@CurrentUser('id') adminId: number, @Param('id', ParseIntPipe) userId: number) {
+        return this.usersService.deleteUser(adminId, userId);
     }
 }

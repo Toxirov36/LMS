@@ -17,10 +17,6 @@ export class CoursesService {
     const courses = await this.prisma.course.findMany({
       where: { published: true },
       include: {
-        category: { select: { id: true, name: true } },
-        mentor: {
-          include: { user: { select: { fullName: true, image: true } } },
-        },
         _count: { select: { purchasedCourses: true, ratings: true, sections: true } },
       },
       orderBy: { createdAt: 'desc' },

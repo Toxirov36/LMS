@@ -24,6 +24,8 @@ import { LessonGroupsModule } from './modules/lesson-groups/lesson-groups.module
 import { PurchasedCoursesService } from './modules/purchased-courses/purchased-courses.service';
 import { PurchasedCoursesController } from './modules/purchased-courses/purchased-courses.controller';
 import { PurchasedCoursesModule } from './modules/purchased-courses/purchased-courses.module';
+import { HomeworkSubmissionController } from './modules/homework-submittions/homework-submittions.controller';
+import { HomeworkSubmissionModule } from './modules/homework-submittions/homework-submittions.module';
 
 @Module({
   imports: [
@@ -44,9 +46,10 @@ import { PurchasedCoursesModule } from './modules/purchased-courses/purchased-co
     SectionsModule,
     UploadModule,
     LessonGroupsModule,
-    PurchasedCoursesModule
+    PurchasedCoursesModule,
+    HomeworkSubmissionModule
   ],
   providers: [AuthService, ExamService, LessonsService, RatingsService, PurchasedCoursesService],
-  controllers: [ExamController, LessonsController, RatingsController, UploadController, PurchasedCoursesController],
+  controllers: [ExamController, LessonsController, RatingsController, UploadController, PurchasedCoursesController, HomeworkSubmissionController],
 })
 export class AppModule {}

@@ -1,47 +1,60 @@
 import {
   Injectable, NotFoundException, ForbiddenException,
 } from '@nestjs/common';
-import { CreateQuestionDto, CreateAnswerDto, UpdateQuestionDto } from './question.dto';
 import { UserRole } from '@prisma/client';
 import { PrismaService } from 'src/core/database/prisma.service';
 
 @Injectable()
 export class QuestionsService {
   constructor(private prisma: PrismaService) {}
-
-  async create(dto: CreateQuestionDto, userId: number) {
-    return this.prisma.question.create({ data: { ...dto, userId } });
-  }
-
-  async findByCourse(courseId: number, userId: number, role: UserRole) {
-    const where: any = { courseId };
-    if (role === UserRole.STUDENT) where.userId = userId;
+  async getMyQuestions(userId: number) {
     return this.prisma.question.findMany({
-      where,
+      where: { userId },
       include: {
-        user: { select: { id: true, fullName: true, image: true } },
+        course: { select: { id: true, name: true } },
         answers: {
-          include: { user: { select: { id: true, fullName: true, role: true, image: true } } },
+          include: {
+            user: { select: { id: true, fullName: true, role: true, image: true } },
+          },
         },
       },
       orderBy: { createdAt: 'desc' },
     });
   }
 
-  async findUnread(userId: number, role: UserRole) {
-    if (role === UserRole.STUDENT) throw new ForbiddenException('Ruxsat yoq');
+  async findByCourse(courseId: number, userId: number, role: UserRole) {
     return this.prisma.question.findMany({
-      where: { read: false },
+      where: { courseId },
       include: {
-        user: { select: { id: true, fullName: true } },
-        course: { select: { id: true, name: true } },
+        user: { select: { id: true, fullName: true, image: true } },
+        answers: {
+          include: {
+            user: { select: { id: true, fullName: true, role: true, image: true } },
+          },
+        },
       },
       orderBy: { createdAt: 'desc' },
     });
   }
 
+  async findOne(id: number) {
+    const q = await this.prisma.question.findUnique({
+      where: { id },
+      include: {
+        user: { select: { id: true, fullName: true, image: true } },
+        course: { select: { id: true, name: true } },
+        answers: {
+          include: {
+            user: { select: { id: true, fullName: true, role: true, image: true } },
+          },
+        },
+      },
+    });
+    if (!q) throw new NotFoundException('Savol topilmadi');
+    return q;
+  }
+
   async markRead(id: number, userId: number, role: UserRole) {
-    if (role === UserRole.STUDENT) throw new ForbiddenException('Ruxsat yoq');
     const q = await this.prisma.question.findUnique({ where: { id } });
     if (!q) throw new NotFoundException('Savol topilmadi');
     return this.prisma.question.update({
@@ -50,28 +63,23 @@ export class QuestionsService {
     });
   }
 
-  async update(id: number, dto: UpdateQuestionDto, userId: number, role: UserRole) {
+  async create(dto: { courseId: number; text: string; file?: string }, userId: number) {
+    return this.prisma.question.create({
+      data: { ...dto, userId },
+      include: {
+        course: { select: { id: true, name: true } },
+      },
+    });
+  }
+
+  async update(id: number, dto: { text?: string; file?: string }, userId: number, role: UserRole) {
     const q = await this.prisma.question.findUnique({ where: { id } });
     if (!q) throw new NotFoundException('Savol topilmadi');
-    if (role !== UserRole.ADMIN && q.userId !== userId) {
-      throw new ForbiddenException('Ruxsat yoq');
-    }
+    if (q.userId !== userId) throw new ForbiddenException('Faqat o\'z savolingizni tahrirlay olasiz');
     return this.prisma.question.update({ where: { id }, data: dto });
   }
 
-  async remove(id: number, userId: number, role: UserRole) {
-    const q = await this.prisma.question.findUnique({ where: { id } });
-    if (!q) throw new NotFoundException('Savol topilmadi');
-    if (role !== UserRole.ADMIN && q.userId !== userId) {
-      throw new ForbiddenException('Ruxsat yoq');
-    }
-    await this.prisma.question.delete({ where: { id } });
-    return { message: 'Savol ochirildi' };
-  }
-
-  // Answers
-  async answer(questionId: number, dto: CreateAnswerDto, userId: number, role: UserRole) {
-    if (role === UserRole.STUDENT) throw new ForbiddenException('Ruxsat yoq');
+  async answer(questionId: number, dto: { text: string; file?: string }, userId: number, role: UserRole) {
     const q = await this.prisma.question.findUnique({ where: { id: questionId } });
     if (!q) throw new NotFoundException('Savol topilmadi');
     return this.prisma.questionAnswer.upsert({
@@ -81,13 +89,32 @@ export class QuestionsService {
     });
   }
 
+  async updateAnswer(answerId: number, dto: { text?: string; file?: string }, userId: number, role: UserRole) {
+    const a = await this.prisma.questionAnswer.findUnique({ where: { id: answerId } });
+    if (!a) throw new NotFoundException('Javob topilmadi');
+    if (role !== UserRole.ADMIN && a.userId !== userId) {
+      throw new ForbiddenException('Ruxsat yo\'q');
+    }
+    return this.prisma.questionAnswer.update({ where: { id: answerId }, data: dto });
+  }
+
   async removeAnswer(answerId: number, userId: number, role: UserRole) {
     const a = await this.prisma.questionAnswer.findUnique({ where: { id: answerId } });
     if (!a) throw new NotFoundException('Javob topilmadi');
     if (role !== UserRole.ADMIN && a.userId !== userId) {
-      throw new ForbiddenException('Ruxsat yoq' );
+      throw new ForbiddenException('Ruxsat yo\'q');
     }
     await this.prisma.questionAnswer.delete({ where: { id: answerId } });
-    return { message: 'Javob ochirildi' };
+    return { message: 'Javob o\'chirildi' };
+  }
+
+  async remove(id: number, userId: number, role: UserRole) {
+    const q = await this.prisma.question.findUnique({ where: { id } });
+    if (!q) throw new NotFoundException('Savol topilmadi');
+    if (role !== UserRole.ADMIN && q.userId !== userId) {
+      throw new ForbiddenException('Faqat o\'z savolingizni o\'chira olasiz');
+    }
+    await this.prisma.question.delete({ where: { id } });
+    return { message: 'Savol o\'chirildi' };
   }
 }

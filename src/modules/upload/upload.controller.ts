@@ -36,43 +36,44 @@ const videoFilter = (_req: any, file: Express.Multer.File, cb: any) => {
 @UseGuards(AuthGuard)
 @Controller('upload')
 export class UploadController {
-    @Post('image')
-    @UseInterceptors(FileInterceptor('file', { storage, fileFilter: imageFilter, limits: { fileSize: 5 * 1024 * 1024 } }))
-    @ApiConsumes('multipart/form-data')
-    @ApiBody({ schema: { type: 'object', properties: { file: { type: 'string', format: 'binary' } } } })
-    @ApiOperation({ summary: 'Rasm yuklash (max 5MB)' })
-    uploadImage(@UploadedFile() file: Express.Multer.File) {
-        if (!file) throw new BadRequestException('Fayl tanlanmadi');
-        return { url: `/uploads/${file.filename}`, filename: file.filename };
-    }
+    // @Post('image')
+    // @UseInterceptors(FileInterceptor('file', { storage, fileFilter: imageFilter, limits: { fileSize: 5 * 1024 * 1024 } }))
+    // @ApiConsumes('multipart/form-data')
+    // @ApiBody({ schema: { type: 'object', properties: { file: { type: 'string', format: 'binary' } } } })
+    // @ApiOperation({ summary: 'Rasm yuklash (max 5MB)' })
+    // uploadImage(@UploadedFile() file: Express.Multer.File) {
+    //     if (!file) throw new BadRequestException('Fayl tanlanmadi');
+    //     return { url: `/uploads/${file.filename}`, filename: file.filename };
+    // }
 
-    @Post('video')
-    @UseInterceptors(FileInterceptor('file', { storage, fileFilter: videoFilter, limits: { fileSize: 500 * 1024 * 1024 } }))
-    @ApiConsumes('multipart/form-data')
-    @ApiBody({ schema: { type: 'object', properties: { file: { type: 'string', format: 'binary' } } } })
-    @ApiOperation({ summary: 'Video yuklash (max 500MB)' })
-    uploadVideo(@UploadedFile() file: Express.Multer.File) {
-        if (!file) throw new BadRequestException('Fayl tanlanmadi');
-        return { url: `/uploads/${file.filename}`, filename: file.filename };
-    }
+    // @Post('video')
+    // @UseInterceptors(FileInterceptor('file', { storage, fileFilter: videoFilter, limits: { fileSize: 500 * 1024 * 1024 } }))
+    // @ApiConsumes('multipart/form-data')
+    // @ApiBody({ schema: { type: 'object', properties: { file: { type: 'string', format: 'binary' } } } })
+    // @ApiOperation({ summary: 'Video yuklash (max 500MB)' })
+    // uploadVideo(@UploadedFile() file: Express.Multer.File) {
+    //     if (!file) throw new BadRequestException('Fayl tanlanmadi');
+    //     return { url: `/uploads/${file.filename}`, filename: file.filename };
+    // }
 
-    @Post('file')
-    @UseInterceptors(FileInterceptor('file', { storage, limits: { fileSize: 20 * 1024 * 1024 } }))
-    @ApiConsumes('multipart/form-data')
-    @ApiBody({ schema: { type: 'object', properties: { file: { type: 'string', format: 'binary' } } } })
-    @ApiOperation({ summary: 'Fayl yuklash (max 20MB)' })
-    uploadFile(@UploadedFile() file: Express.Multer.File) {
-        if (!file) throw new BadRequestException('Fayl tanlanmadi');
-        return { url: `/uploads/${file.filename}`, filename: file.filename };
-    }
+    // @Post('file')
+    // @UseInterceptors(FileInterceptor('file', { storage, limits: { fileSize: 20 * 1024 * 1024 } }))
+    // @ApiConsumes('multipart/form-data')
+    // @ApiBody({ schema: { type: 'object', properties: { file: { type: 'string', format: 'binary' } } } })
+    // @ApiOperation({ summary: 'Fayl yuklash (max 20MB)' })
+    // uploadFile(@UploadedFile() file: Express.Multer.File) {
+    //     if (!file) throw new BadRequestException('Fayl tanlanmadi');
+    //     return { url: `/uploads/${file.filename}`, filename: file.filename };
+    // }
 
-    @Post('files')
-    @UseInterceptors(FilesInterceptor('files', 10, { storage, limits: { fileSize: 20 * 1024 * 1024 } }))
-    @ApiConsumes('multipart/form-data')
-    @ApiBody({ schema: { type: 'object', properties: { files: { type: 'array', items: { type: 'string', format: 'binary' } } } } })
-    @ApiOperation({ summary: 'Bir necha fayl yuklash (max 10 ta)' })
-    uploadFiles(@UploadedFiles() files: Express.Multer.File[]) {
-        if (!files?.length) throw new BadRequestException('Fayllar tanlanmadi');
-        return files.map((f) => ({ url: `/uploads/${f.filename}`, filename: f.filename }));
-    }
+    // @Post('files')
+    // @UseInterceptors(FilesInterceptor('files', 10, { storage, limits: { fileSize: 20 * 1024 * 1024 } }))
+    // @ApiConsumes('multipart/form-data')
+    // @ApiBody({ schema: { type: 'object', properties: { files: { type: 'array', items: { type: 'string', format: 'binary' } } } } })
+    // @ApiOperation({ summary: 'Bir necha fayl yuklash (max 10 ta)' })
+    // uploadFiles(@UploadedFiles() files: Express.Multer.File[]) {
+    //     if (!files?.length) throw new BadRequestException('Fayllar tanlanmadi');
+    //     return files.map((f) => ({ url: `/uploads/${f.filename}`, filename: f.filename }));
+    // }
+
 }

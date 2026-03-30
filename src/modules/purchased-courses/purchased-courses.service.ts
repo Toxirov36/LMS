@@ -9,21 +9,28 @@ export class PurchasedCoursesService {
     constructor(private prisma: PrismaService) { }
 
     async getMyPurchasedCourses(userId: number) {
-        const where: any = { userId };
+        const where = { userId };  // ← bir joyda define qiling
 
         const [data, total] = await Promise.all([
             this.prisma.purchasedCourse.findMany({
-                where,
+                where,  // ← shu yerga qo'shing
                 include: {
                     course: {
-                        include: {
-                            category: { select: { id: true, name: true } },
+                        select: {
+                            id: true,
+                            name: true,
+                            about: true,
+                            level: true,
                             mentor: {
-                                include: {
-                                    user: { select: { id: true, fullName: true, image: true } },
+                                select: {
+                                    user: {
+                                        select: {
+                                            fullName: true,
+                                            image: true,
+                                        },
+                                    },
                                 },
                             },
-                            _count: { select: { sections: true, ratings: true } },
                         },
                     },
                 },

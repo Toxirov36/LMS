@@ -18,7 +18,7 @@ export class HomeworkService {
         });
         if (!lesson) throw new NotFoundException('Dars topilmadi');
         if (role !== UserRole.ADMIN && lesson.section.course.mentor.userId !== userId) {
-            throw new ForbiddenException('Ruxsat yo\'q');
+            throw new ForbiddenException('Ruxsat yoq');
         }
         const exists = await this.prisma.homework.findUnique({ where: { lessonId: dto.lessonId } });
         if (exists) throw new ConflictException('Bu darsha uy vazifasi allaqachon mavjud');
@@ -45,7 +45,7 @@ export class HomeworkService {
         });
         if (!hw) throw new NotFoundException('Uy vazifasi topilmadi');
         if (role !== UserRole.ADMIN && hw.lesson.section.course.mentor.userId !== userId) {
-            throw new ForbiddenException('Ruxsat yo\'q');
+            throw new ForbiddenException('Ruxsat yoq');
         }
         return this.prisma.homework.update({ where: { id }, data: dto });
     }
@@ -61,7 +61,7 @@ export class HomeworkService {
         });
         if (!hw) throw new NotFoundException('Uy vazifasi topilmadi');
         if (role !== UserRole.ADMIN && hw.lesson.section.course.mentor.userId !== userId) {
-            throw new ForbiddenException('Ruxsat yo\'q');
+            throw new ForbiddenException('Ruxsat yoq');
         }
         await this.prisma.homework.delete({ where: { id } });
         return { message: 'Uy vazifasi o\'chirildi' };
@@ -106,7 +106,7 @@ export class HomeworkService {
             role !== UserRole.ASSISTANT &&
             sub.homework.lesson.section.course.mentor.userId !== userId
         ) {
-            throw new ForbiddenException('Ruxsat yo\'q');
+            throw new ForbiddenException('Ruxsat yoq');
         }
         return this.prisma.homeworkSubmission.update({
             where: { id: submissionId },

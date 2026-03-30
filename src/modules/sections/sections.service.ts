@@ -5,13 +5,13 @@ import { PrismaService } from 'src/core/database/prisma.service';
 
 @Injectable()
 export class SectionsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) { }
 
   private async checkCourseOwnership(userId: number, courseId: number) {
     const user = await this.prisma.user.findUnique({ where: { id: userId } });
-    
+
     if (!user) throw new NotFoundException('User topilmadi');
-    
+
     if (user.role === UserRole.ADMIN) return;
     const mentor = await this.prisma.mentorProfile.findUnique({ where: { userId } });
     const course = await this.prisma.course.findUnique({ where: { id: courseId } });

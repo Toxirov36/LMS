@@ -8,10 +8,10 @@ import { CurrentUser } from 'src/core/guards/roles.guard';
 @ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
-  constructor(private authService: AuthService) {}
+  constructor(private authService: AuthService) { }
 
   @Post('register')
-  @ApiOperation({ summary: 'Ro\'yxatdan o\'tish' })
+  @ApiOperation({ summary: 'Royxatdan otish' })
   register(@Body() dto: RegisterDto) {
     return this.authService.register(dto);
   }
@@ -33,7 +33,7 @@ export class AuthController {
   @Patch('change-password')
   @UseGuards(AuthGuard)
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Parolni o\'zgartirish' })
+  @ApiOperation({ summary: 'Parolni ozgartirish' })
   changePassword(@CurrentUser('id') userId: number, @Body() dto: ChangePasswordDto) {
     return this.authService.changePassword(userId, dto);
   }

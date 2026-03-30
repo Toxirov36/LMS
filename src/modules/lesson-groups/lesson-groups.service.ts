@@ -21,7 +21,6 @@ export class LessonGroupService {
         }
     }
 
-    // GET /api/lesson-group/all/:course_id  — public
     async findAllByCourse(courseId: number) {
         const course = await this.prisma.course.findUnique({ where: { id: courseId } });
         if (!course) throw new NotFoundException('Kurs topilmadi');
@@ -39,13 +38,10 @@ export class LessonGroupService {
         });
     }
 
-    // GET /api/lesson-group/mine-all/:course_id  — STUDENT
-    // Student uchun: dars ko'rilganmi va exam natijasi ham qo'shiladi
     async findAllByCourseForStudent(courseId: number, userId: number) {
         const course = await this.prisma.course.findUnique({ where: { id: courseId } });
         if (!course) throw new NotFoundException('Kurs topilmadi');
 
-        // Studentda kurs bormi tekshirish
         const hasCourse = await this.prisma.purchasedCourse.findUnique({
             where: { courseId_userId: { courseId, userId } },
         });
@@ -75,7 +71,6 @@ export class LessonGroupService {
             orderBy: { createdAt: 'asc' },
         });
 
-        // Har bir bo\'lim uchun progress hisoblash
         return sections.map((section) => {
             const totalLessons = section.lessons.length;
             const viewedLessons = section.lessons.filter(
@@ -96,7 +91,6 @@ export class LessonGroupService {
         });
     }
 
-    // GET /api/lesson-group/detail/:id  — auth required
     async findOne(id: number) {
         const section = await this.prisma.sectionLesson.findUnique({
             where: { id },
@@ -117,11 +111,10 @@ export class LessonGroupService {
                 _count: { select: { lessons: true, exams: true } },
             },
         });
-        if (!section) throw new NotFoundException('Bo\'lim topilmadi');
+        if (!section) throw new NotFoundException('Bolim topilmadi');
         return section;
     }
 
-    // POST /api/lesson-group  — MENTOR, ADMIN
     async create(dto: CreateLessonGroupDto, userId: number, role: UserRole) {
         const course = await this.prisma.course.findUnique({
             where: { id: dto.courseId },
@@ -129,25 +122,21 @@ export class LessonGroupService {
         });
         if (!course) throw new NotFoundException('Kurs topilmadi');
         if (role !== UserRole.ADMIN && course.mentor.userId !== userId) {
-            throw new ForbiddenException('Faqat o\'z kursiga bo\'lim qo\'sha olasiz');
+            throw new ForbiddenException('Faqat oz kursiga bolim qosha olasiz');
         }
         return this.prisma.sectionLesson.create({ data: dto });
     }
-
-    // PUT /api/lesson-group/:id  — MENTOR, ADMIN
     async update(id: number, dto: UpdateLessonGroupDto, userId: number, role: UserRole) {
         const section = await this.prisma.sectionLesson.findUnique({ where: { id } });
-        if (!section) throw new NotFoundException('Bo\'lim topilmadi');
+        if (!section) throw new NotFoundException('Bolim topilmadi');
         await this.checkOwnership(id, userId, role);
         return this.prisma.sectionLesson.update({ where: { id }, data: dto });
     }
-
-    // DELETE /api/lesson-group/:id  — MENTOR, ADMIN
     async remove(id: number, userId: number, role: UserRole) {
         const section = await this.prisma.sectionLesson.findUnique({ where: { id } });
-        if (!section) throw new NotFoundException('Bo\'lim topilmadi');
+        if (!section) throw new NotFoundException('Bolim topilmadi');
         await this.checkOwnership(id, userId, role);
         await this.prisma.sectionLesson.delete({ where: { id } });
-        return { message: 'Bo\'lim o\'chirildi' };
+        return { message: 'Bolim ochirildi' };
     }
 }

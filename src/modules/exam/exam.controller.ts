@@ -29,7 +29,7 @@ export class ExamController {
   }
 
   @Get('section/:sectionId')
-  @ApiOperation({ summary: 'Bo\'limdagi savollar' })
+  @ApiOperation({ summary: 'Bolimdagi savollar' })
   findBySection(
     @Param('sectionId', ParseIntPipe) sectionId: number,
     @CurrentUser('id') userId: number,
@@ -76,7 +76,7 @@ export class ExamController {
   @Delete(':id')
   @UseGuards(RoleGuard)
   @Roles(UserRole.MENTOR, UserRole.ADMIN)
-  @ApiOperation({ summary: 'Savolni o\'chirish' })
+  @ApiOperation({ summary: 'Savolni ochirish' })
   remove(
     @Param('id', ParseIntPipe) id: number,
     @CurrentUser('id') userId: number,

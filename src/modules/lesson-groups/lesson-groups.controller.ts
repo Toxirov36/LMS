@@ -16,17 +16,16 @@ export class LessonGroupController {
   constructor(private lessonGroupService: LessonGroupService) {}
 
   @Get('all/:course_id')
-  @ApiOperation({ summary: 'Kursning barcha bo\'limlari (public)' })
+  @ApiOperation({ summary: 'Kursning barcha bolimlari (public)' })
   findAllByCourse(@Param('course_id', ParseIntPipe) courseId: number) {
     return this.lessonGroupService.findAllByCourse(courseId);
   }
 
-  // GET /api/lesson-group/mine-all/:course_id  — STUDENT
   @Get('mine-all/:course_id')
   @UseGuards(AuthGuard, RoleGuard)
   @Roles(UserRole.STUDENT)
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Mening kursim bo\'limlari (progress bilan) - STUDENT' })
+  @ApiOperation({ summary: 'Mening kursim bolimlari (progress bilan) - STUDENT' })
   findAllForStudent(
     @Param('course_id', ParseIntPipe) courseId: number,
     @CurrentUser('id') userId: number,
@@ -34,21 +33,18 @@ export class LessonGroupController {
     return this.lessonGroupService.findAllByCourseForStudent(courseId, userId);
   }
 
-  // GET /api/lesson-group/detail/:id  — auth required
   @Get('detail/:id')
   @UseGuards(AuthGuard)
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Bo\'lim batafsil ma\'lumoti' })
+  @ApiOperation({ summary: 'Bolim batafsil malumoti' })
   findOne(@Param('id', ParseIntPipe) id: number) {
     return this.lessonGroupService.findOne(id);
   }
-
-  // POST /api/lesson-group  — MENTOR, ADMIN
   @Post()
   @UseGuards(AuthGuard, RoleGuard)
   @Roles(UserRole.MENTOR, UserRole.ADMIN)
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Bo\'lim yaratish - MENTOR, ADMIN' })
+  @ApiOperation({ summary: 'Bolim yaratish - MENTOR, ADMIN' })
   create(
     @Body() dto: CreateLessonGroupDto,
     @CurrentUser('id') userId: number,
@@ -57,12 +53,11 @@ export class LessonGroupController {
     return this.lessonGroupService.create(dto, userId, role);
   }
 
-  // PUT /api/lesson-group/:id  — MENTOR, ADMIN
   @Put(':id')
   @UseGuards(AuthGuard, RoleGuard)
   @Roles(UserRole.MENTOR, UserRole.ADMIN)
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Bo\'limni tahrirlash - MENTOR, ADMIN' })
+  @ApiOperation({ summary: 'Bolimni tahrirlash - MENTOR, ADMIN' })
   update(
     @Param('id', ParseIntPipe) id: number,
     @Body() dto: UpdateLessonGroupDto,
@@ -72,12 +67,11 @@ export class LessonGroupController {
     return this.lessonGroupService.update(id, dto, userId, role);
   }
 
-  // DELETE /api/lesson-group/:id  — MENTOR, ADMIN
   @Delete(':id')
   @UseGuards(AuthGuard, RoleGuard)
   @Roles(UserRole.MENTOR, UserRole.ADMIN)
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Bo\'limni o\'chirish - MENTOR, ADMIN' })
+  @ApiOperation({ summary: 'Bolimni ochirish - MENTOR, ADMIN' })
   remove(
     @Param('id', ParseIntPipe) id: number,
     @CurrentUser('id') userId: number,

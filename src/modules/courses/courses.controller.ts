@@ -21,7 +21,6 @@ import { Roles } from 'src/core/decorators/role.decorator';
 export class CoursesController {
   constructor(private coursesService: CoursesService) {}
 
-  // ─── PUBLIC ───────────────────────────────────────────────
   @Get()
   @ApiOperation({ summary: 'Barcha nashr etilgan kurslar' })
   findAll() {
@@ -29,17 +28,16 @@ export class CoursesController {
   }
 
   @Get('single/:id')
-  @ApiOperation({ summary: 'Kurs haqida qisqa ma\'lumot (public)' })
+  @ApiOperation({ summary: 'Kurs haqida qisqa malumot (public)' })
   findSingle(@Param('id') id: string) {
     return this.coursesService.findSingle(+id);
   }
 
-  // ─── AUTH REQUIRED ────────────────────────────────────────
   @Get('single-full/:id')
   @UseGuards(AuthGuard, RoleGuard)
   @Roles(UserRole.ADMIN, UserRole.MENTOR, UserRole.ASSISTANT)
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Kurs to\'liq ma\'lumoti - ADMIN, MENTOR, ASSISTANT' })
+  @ApiOperation({ summary: 'Kurs toliq malumoti - ADMIN, MENTOR, ASSISTANT' })
   findSingleFull(@Param('id') id: string) {
     return this.coursesService.findSingleFull(+id);
   }
@@ -173,7 +171,7 @@ export class CoursesController {
   @UseGuards(AuthGuard, RoleGuard)
   @Roles(UserRole.ADMIN, UserRole.MENTOR)
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Kursni o\'chirish - ADMIN, MENTOR' })
+  @ApiOperation({ summary: 'Kursni ochirish - ADMIN, MENTOR' })
   remove(
     @Param('id') id: string,
     @CurrentUser('id') userId: number,

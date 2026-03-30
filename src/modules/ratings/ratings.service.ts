@@ -48,9 +48,9 @@ export class RatingsService {
     const rating = await this.prisma.rating.findUnique({ where: { id } });
     if (!rating) throw new NotFoundException('Baho topilmadi');
     if (role !== UserRole.ADMIN && rating.userId !== userId) {
-      throw new ForbiddenException('Ruxsat yo\'q');
+      throw new ForbiddenException('Ruxsat yoq');
     }
     await this.prisma.rating.delete({ where: { id } });
-    return { message: 'Baho o\'chirildi' };
+    return { message: 'Baho ochirildi' };
   }
 }

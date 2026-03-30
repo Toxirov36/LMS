@@ -49,7 +49,7 @@ export class PurchasedCoursesController {
   @Get('course/:id/students')
   @UseGuards(RoleGuard)
   @Roles(UserRole.MENTOR, UserRole.ADMIN)
-  @ApiOperation({ summary: 'Kurs o\'quvchilari - MENTOR, ADMIN' })
+  @ApiOperation({ summary: 'Kurs oquvchilari - MENTOR, ADMIN' })
   getCourseStudents(
     @Param('id') courseId: number,
     @CurrentUser('id') userId: number,
@@ -61,7 +61,7 @@ export class PurchasedCoursesController {
   @Post('create')
   @UseGuards(RoleGuard)
   @Roles(UserRole.ADMIN)
-  @ApiOperation({ summary: 'Kurs qo\'lda biriktirish (to\'lov) - ADMIN' })
+  @ApiOperation({ summary: 'Kurs qolda biriktirish (tolov) - ADMIN' })
   createPurchaseAdmin(@Body() dto: CreatePurchaseAdminDto) {
     return this.purchasedCoursesService.createPurchaseAdmin(dto);
   }

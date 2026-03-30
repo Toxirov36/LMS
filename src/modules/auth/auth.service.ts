@@ -34,7 +34,6 @@ export class AuthService {
   //   return { message: 'OTP sent (Redis)' };
   // }
 
-  // // ✅ VERIFY OTP
   // async verifyOtp(email: string, code: string) {
   //   const stored = await this.redis.get(`otp:${email}`);
 
@@ -49,7 +48,7 @@ export class AuthService {
 
   async register(dto: RegisterDto) {
     const exists = await this.prisma.user.findUnique({ where: { phone: dto.phone } });
-    if (exists) throw new ConflictException('Bu telefon raqam allaqachon ro\'yxatdan o\'tgan');
+    if (exists) throw new ConflictException('Bu telefon raqam allaqachon royxatdan otgan');
 
     const hashed = await bcrypt.hash(dto.password, 10);
     const user = await this.prisma.user.create({
@@ -95,11 +94,11 @@ export class AuthService {
     if (!user) throw new NotFoundException('User not found');
 
     const valid = await bcrypt.compare(dto.oldPassword, user.password);
-    if (!valid) throw new UnauthorizedException('Eski parol noto\'g\'ri');
+    if (!valid) throw new UnauthorizedException('Eski parol notogri');
 
     const hashed = await bcrypt.hash(dto.newPassword, 10);
     await this.prisma.user.update({ where: { id: userId }, data: { password: hashed } });
-    return { message: 'Parol muvaffaqiyatli o\'zgartirildi' };
+    return { message: 'Parol muvaffaqiyatli ozgartirildi' };
   }
 
   private async signToken(userId: number, role: string) {

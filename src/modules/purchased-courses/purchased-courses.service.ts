@@ -118,7 +118,7 @@ export class PurchasedCoursesService {
         if (!course) throw new NotFoundException('Kurs topilmadi');
 
         if (role !== 'ADMIN' && course.mentor.userId !== userId) {
-            throw new ForbiddenException('Faqat o\'z kursining o\'quvchilarini ko\'ra olasiz');
+            throw new ForbiddenException('Faqat oz kursining oquvchilarini kora olasiz');
         }
 
         const students = await this.prisma.purchasedCourse.findMany({
@@ -142,7 +142,6 @@ export class PurchasedCoursesService {
         };
     }
 
-    // POST /api/purchased-courses/create  - ADMIN
     async createPurchaseAdmin(dto: CreatePurchaseAdminDto) {
         const [course, user] = await Promise.all([
             this.prisma.course.findUnique({ where: { id: dto.courseId } }),

@@ -16,7 +16,7 @@ export class RatingsController {
   @Post()
   @UseGuards(AuthGuard)
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Kursga baho qo\'yish' })
+  @ApiOperation({ summary: 'Kursga baho qoyish' })
   create(@Body() dto: CreateRatingDto, @CurrentUser('id') userId: number) {
     return this.ratingsService.create(dto, userId);
   }
@@ -30,7 +30,7 @@ export class RatingsController {
   @Delete(':id')
   @UseGuards(AuthGuard)
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Bahoni o\'chirish' })
+  @ApiOperation({ summary: 'Bahoni ochirish' })
   remove(
     @Param('id', ParseIntPipe) id: number,
     @CurrentUser('id') userId: number,

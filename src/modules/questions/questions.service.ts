@@ -29,7 +29,7 @@ export class QuestionsService {
   }
 
   async findUnread(userId: number, role: UserRole) {
-    if (role === UserRole.STUDENT) throw new ForbiddenException('Ruxsat yo\'q');
+    if (role === UserRole.STUDENT) throw new ForbiddenException('Ruxsat yoq');
     return this.prisma.question.findMany({
       where: { read: false },
       include: {
@@ -41,7 +41,7 @@ export class QuestionsService {
   }
 
   async markRead(id: number, userId: number, role: UserRole) {
-    if (role === UserRole.STUDENT) throw new ForbiddenException('Ruxsat yo\'q');
+    if (role === UserRole.STUDENT) throw new ForbiddenException('Ruxsat yoq');
     const q = await this.prisma.question.findUnique({ where: { id } });
     if (!q) throw new NotFoundException('Savol topilmadi');
     return this.prisma.question.update({
@@ -54,7 +54,7 @@ export class QuestionsService {
     const q = await this.prisma.question.findUnique({ where: { id } });
     if (!q) throw new NotFoundException('Savol topilmadi');
     if (role !== UserRole.ADMIN && q.userId !== userId) {
-      throw new ForbiddenException('Ruxsat yo\'q');
+      throw new ForbiddenException('Ruxsat yoq');
     }
     return this.prisma.question.update({ where: { id }, data: dto });
   }
@@ -63,15 +63,15 @@ export class QuestionsService {
     const q = await this.prisma.question.findUnique({ where: { id } });
     if (!q) throw new NotFoundException('Savol topilmadi');
     if (role !== UserRole.ADMIN && q.userId !== userId) {
-      throw new ForbiddenException('Ruxsat yo\'q');
+      throw new ForbiddenException('Ruxsat yoq');
     }
     await this.prisma.question.delete({ where: { id } });
-    return { message: 'Savol o\'chirildi' };
+    return { message: 'Savol ochirildi' };
   }
 
   // Answers
   async answer(questionId: number, dto: CreateAnswerDto, userId: number, role: UserRole) {
-    if (role === UserRole.STUDENT) throw new ForbiddenException('Ruxsat yo\'q');
+    if (role === UserRole.STUDENT) throw new ForbiddenException('Ruxsat yoq');
     const q = await this.prisma.question.findUnique({ where: { id: questionId } });
     if (!q) throw new NotFoundException('Savol topilmadi');
     return this.prisma.questionAnswer.upsert({
@@ -85,9 +85,9 @@ export class QuestionsService {
     const a = await this.prisma.questionAnswer.findUnique({ where: { id: answerId } });
     if (!a) throw new NotFoundException('Javob topilmadi');
     if (role !== UserRole.ADMIN && a.userId !== userId) {
-      throw new ForbiddenException('Ruxsat yo\'q');
+      throw new ForbiddenException('Ruxsat yoq' );
     }
     await this.prisma.questionAnswer.delete({ where: { id: answerId } });
-    return { message: 'Javob o\'chirildi' };
+    return { message: 'Javob ochirildi' };
   }
 }

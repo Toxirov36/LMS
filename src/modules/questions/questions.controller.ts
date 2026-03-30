@@ -35,7 +35,7 @@ export class QuestionsController {
   @Get('unread')
   @UseGuards(RoleGuard)
   @Roles(UserRole.MENTOR, UserRole.ADMIN, UserRole.ASSISTANT)
-  @ApiOperation({ summary: 'O\'qilmagan savollar (Mentor/Admin/Assistant)' })
+  @ApiOperation({ summary: 'Oqilmagan savollar (Mentor/Admin/Assistant)' })
   findUnread(
     @CurrentUser('id') userId: number,
     @CurrentUser('role') role: UserRole,
@@ -46,7 +46,7 @@ export class QuestionsController {
   @Patch(':id/read')
   @UseGuards(RoleGuard)
   @Roles(UserRole.MENTOR, UserRole.ADMIN, UserRole.ASSISTANT)
-  @ApiOperation({ summary: 'Savolni o\'qildi deb belgilash' })
+  @ApiOperation({ summary: 'Savolni oqildi deb belgilash' })
   markRead(
     @Param('id', ParseIntPipe) id: number,
     @CurrentUser('id') userId: number,
@@ -67,7 +67,7 @@ export class QuestionsController {
   }
 
   @Delete(':id')
-  @ApiOperation({ summary: 'Savolni o\'chirish' })
+  @ApiOperation({ summary: 'Savolni ochirish' })
   remove(
     @Param('id', ParseIntPipe) id: number,
     @CurrentUser('id') userId: number,
@@ -90,7 +90,7 @@ export class QuestionsController {
   }
 
   @Delete('answers/:answerId')
-  @ApiOperation({ summary: 'Javobni o\'chirish' })
+  @ApiOperation({ summary: 'Javobni ochirish' })
   removeAnswer(
     @Param('answerId', ParseIntPipe) answerId: number,
     @CurrentUser('id') userId: number,

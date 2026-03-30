@@ -15,8 +15,8 @@ export class ExamService {
       where: { id: sectionId },
       include: { course: { include: { mentor: true } } },
     });
-    if (!section) throw new NotFoundException('Bo\'lim topilmadi');
-    if (section.course.mentor.userId !== userId) throw new ForbiddenException('Ruxsat yo\'q');
+    if (!section) throw new NotFoundException('Bolim topilmadi');
+    if (section.course.mentor.userId !== userId) throw new ForbiddenException('Ruxsat yoq');
   }
 
   async create(dto: CreateExamDto, userId: number, role: UserRole) {
@@ -30,7 +30,6 @@ export class ExamService {
       orderBy: { createdAt: 'asc' },
     });
 
-    // Hide correct answers from students
     if (role === UserRole.STUDENT) {
       return exams.map(({ answer, ...rest }) => rest);
     }
@@ -49,7 +48,7 @@ export class ExamService {
     if (!exam) throw new NotFoundException('Savol topilmadi');
     await this.checkMentorSection(exam.sectionLessonId, userId, role);
     await this.prisma.exam.delete({ where: { id } });
-    return { message: 'Savol o\'chirildi' };
+    return { message: 'Savol ochirildi' };
   }
 
   async submitExam(dto: SubmitExamDto, userId: number) {
@@ -57,7 +56,7 @@ export class ExamService {
       where: { sectionLessonId: dto.sectionLessonId },
     });
 
-    if (exams.length === 0) throw new NotFoundException('Bu bo\'limda savollar topilmadi');
+    if (exams.length === 0) throw new NotFoundException('Bu bolimda savollar topilmadi');
 
     const examMap = new Map(exams.map((e) => [e.id, e]));
     let corrects = 0;

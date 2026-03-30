@@ -13,7 +13,6 @@ import { PrismaService } from 'src/core/database/prisma.service';
 export class CoursesService {
   constructor(private prisma: PrismaService) { }
 
-  // ─── GET /api/courses ─────────────────────────────────────
   async findAll() {
     const courses = await this.prisma.course.findMany({
       where: { published: true },
@@ -33,7 +32,6 @@ export class CoursesService {
     }
   }
 
-  // ─── GET /api/courses/single/:id ──────────────────────────
   async findSingle(id: number) {
     const course = await this.prisma.course.findUnique({
       where: { id, published: true },
@@ -59,7 +57,6 @@ export class CoursesService {
     }
   }
 
-  // ─── GET /api/courses/single-full/:id ────────────────────
   async findSingleFull(id: number) {
     const course = await this.prisma.course.findUnique({
       where: { id },
@@ -93,7 +90,6 @@ export class CoursesService {
     }
   }
 
-  // ─── GET /api/courses/all ─────────────────────────────────
   async findAllAdmin() {
     const courses = await this.prisma.course.findMany({
       include: {
@@ -112,7 +108,6 @@ export class CoursesService {
     }
   }
 
-  // ─── GET /api/courses/my ──────────────────────────────────
   async findMyCourses(userId: number) {
     const mentor = await this.prisma.mentorProfile.findUnique({ where: { userId } });
     if (!mentor) throw new NotFoundException('Mentor profil topilmadi');
@@ -131,7 +126,6 @@ export class CoursesService {
     }
   }
 
-  // ─── GET /api/courses/mentor/:id ─────────────────────────
   async findMentorCourses(mentorUserId: number) {
     const mentor = await this.prisma.mentorProfile.findUnique({
       where: { userId: mentorUserId },
@@ -151,7 +145,6 @@ export class CoursesService {
     }
   }
 
-  // ─── GET /api/courses/my/assigned ────────────────────────
   async findAssistantCourses(userId: number) {
     const courses = await this.prisma.assignedCourse.findMany({
       where: { userId },
@@ -171,7 +164,6 @@ export class CoursesService {
     }
   }
 
-  // ─── GET /api/courses/:courseId/assistants ────────────────
   async getCourseAssistants(courseId: number) {
     const courses = await this.prisma.assignedCourse.findMany({
       where: {
@@ -189,7 +181,6 @@ export class CoursesService {
     }
   }
 
-  // ─── POST /api/courses/assign-assistant ──────────────────
   async assignAssistant(dto: AssignAssistantDto, userId: number, role: UserRole) {
     const course = await this.prisma.course.findUnique({
       where: { id: dto.courseId },
@@ -216,7 +207,6 @@ export class CoursesService {
     });
   }
 
-  // ─── POST /api/courses/unassign-assistant ─────────────────
   async unassignAssistant(dto: UnassignAssistantDto, userId: number, role: UserRole) {
     const course = await this.prisma.course.findUnique({
       where: { id: dto.courseId },
@@ -224,7 +214,7 @@ export class CoursesService {
     });
     if (!course) throw new NotFoundException('Kurs topilmadi');
     if (role !== UserRole.ADMIN && course.mentor.userId !== userId) {
-      throw new ForbiddenException('Ruxsat yo\'q');
+      throw new ForbiddenException('Ruxsat yoq');
     }
 
     const assigned = await this.prisma.assignedCourse.findUnique({
@@ -238,7 +228,6 @@ export class CoursesService {
     return { message: 'Assistant kursdan olib tashlandi' };
   }
 
-  // ─── POST /api/courses/create ─────────────────────────────
   async create(dto: CreateCourseDto, userId: number, role: UserRole) {
     try {
       let mentorId: number;
@@ -246,7 +235,6 @@ export class CoursesService {
       if (!category) throw new NotFoundException('Kategoriya topilmadi');
 
       if (role === UserRole.ADMIN) {
-        // Admin uchun mentorId DTOdan keladi yoki birinchi mentorni oladi
         const mentor = await this.prisma.mentorProfile.findFirst();
         if (!mentor) throw new NotFoundException('Hech qanday mentor topilmadi');
         mentorId = mentor.id;
@@ -262,7 +250,6 @@ export class CoursesService {
     }
   }
 
-  // ─── PATCH /api/courses/update/:id ───────────────────────
   async update(id: number, dto: UpdateCourseDto, userId: number, role: UserRole) {
     const course = await this.prisma.course.findUnique({
       where: { id },
@@ -270,13 +257,11 @@ export class CoursesService {
     });
     if (!course) throw new NotFoundException('Kurs topilmadi');
     if (role !== UserRole.ADMIN && course.mentor.userId !== userId) {
-      throw new ForbiddenException('Faqat o\'z kursini tahrirlash mumkin');
+      throw new ForbiddenException('Faqat oz kursini tahrirlash mumkin');
     }
     return this.prisma.course.update({ where: { id }, data: dto });
   }
 
-  // ─── POST /api/courses/publish/:id ───────────────────────
-  // ─── POST /api/courses/unpublish/:id ─────────────────────
   async setPublished(id: number, published: boolean) {
     const course = await this.prisma.course.findUnique({ where: { id } });
     if (!course) throw new NotFoundException('Kurs topilmadi');
@@ -287,7 +272,6 @@ export class CoursesService {
     });
   }
 
-  // ─── PATCH /api/courses/update-mentor ────────────────────
   async updateMentor(dto: UpdateCourseMentorDto) {
     const course = await this.prisma.course.findUnique({ where: { id: dto.courseId } });
     if (!course) throw new NotFoundException('Kurs topilmadi');
@@ -304,20 +288,19 @@ export class CoursesService {
     });
   }
 
-  // ─── DELETE /api/courses/delete/:id ──────────────────────
   async remove(id: number, userId: number, role: UserRole) {
-      if (!id) throw new BadRequestException('Kurs ID kiritilmadi');
-      const course = await this.prisma.course.findUnique({
-        where: { id },
-        include: { mentor: true },
-      });
+    if (!id) throw new BadRequestException('Kurs ID kiritilmadi');
+    const course = await this.prisma.course.findUnique({
+      where: { id },
+      include: { mentor: true },
+    });
 
 
-      if (!course) throw new NotFoundException('Kurs topilmadi');
-      if (role !== UserRole.ADMIN && course.mentor.userId !== userId) {
-        throw new ForbiddenException('Faqat o\'z kursini o\'chirish mumkin');
-      }
-      await this.prisma.course.delete({ where: { id } });
-      return { message: 'Kurs o\'chirildi' };
+    if (!course) throw new NotFoundException('Kurs topilmadi');
+    if (role !== UserRole.ADMIN && course.mentor.userId !== userId) {
+      throw new ForbiddenException('Faqat oz kursini ochirish mumkin');
+    }
+    await this.prisma.course.delete({ where: { id } });
+    return { message: 'Kurs ochirildi' };
   }
 }
